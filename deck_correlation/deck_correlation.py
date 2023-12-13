@@ -1,10 +1,11 @@
-from deck import Deck, compatibility
+from ..utils.deck import Deck, compatibility
 import gspread
+from config.google_import import file_key
 
 #%% importing data from sheets
 sa = gspread.service_account(filename = "service_account.json")
 
-key = "1Y_e89l1NRHiXB8GOU6hbnGbeycmts7bfzzI_Ih2hOL0" #key from the document
+key = file_key #key from the document
 sheet_name = "Winrate" #name of desired sheet
 
 sh = sa.open_by_key(key)
