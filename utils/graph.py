@@ -1,3 +1,5 @@
+from matching import Matching
+
 class Graph:
     adj_matrix: list[list[int]] = [[]]
     number_vertex: int
@@ -130,8 +132,61 @@ class Graph:
 
                     if index == v2:
                         return distances[index]
+                    
+    def find_augmenting_path (
+        self, vertex: int
+    ):
+        pass
+    
+    def maximum_matching (
+        self
+    ) -> tuple[list[tuple[int,int]], list[int]]:
+    
+        matching = Matching(self.number_vertex)
 
-# bug fix to work with tuple list
+        while (matching.non_matched):
+
+            for vertex in matching.non_matched:
+
+                path = self.find_augmenting_path(vertex)
+
+                # updating vertexes in path
+                if path:
+                    matching.make_matched(path[0])
+                    matching.make_matched(path[-1])
+                    for v1, v2 in zip(path[::2], path[1::2]):
+                        matching.change_match(v1, v2)
+                    break
+
+            else:
+                print("Tried all free nodes and no path were found")
+                break
+
+        return (matching.get_pairings(), matching.non_matched)
+    
+def find_cycles (ancestors_v1: list[int], ancestors_v2: list[int]) -> list[int]:
+    
+    minimum_lenght = min ([len(ancestors_v1),len(ancestors_v2)])
+
+    for i in range(minimum_lenght):
+        if ancestors_v1[i] == ancestors_v2[i]:
+            aux = i
+            break
+    else:
+        aux = minimum_lenght
+
+    return ancestors_v1[:aux] + ancestors_v2[aux::-1]
+    
+def find_ancestors (parents: dict[int,int], vertex: int) -> list[int]:
+    ancestors = [vertex]
+    current_vertex = vertex
+
+    while (parents[current_vertex]):
+        current_vertex = parents[current_vertex]
+        ancestors.append(current_vertex)
+
+    return ancestors
+
 def binary_search (ordered_list, value, start, end) -> None:
 
     if start == end:
