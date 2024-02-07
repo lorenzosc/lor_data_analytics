@@ -1,4 +1,5 @@
-from matching import Matching
+from utils.graph.matching import Matching
+from .. import binary_search
 
 class Graph:
     adj_matrix: list[list[int]] = [[]]
@@ -40,6 +41,7 @@ class Graph:
                 new_vertex.append(1)
 
         self.adj_matrix.append(new_vertex)
+        self.number_vertex += 1
 
         if weight_list is not []:
             indexes = ""
@@ -50,11 +52,17 @@ class Graph:
                 + "\n" + indexes
             )
         
+    # Doesn't really removes the vertex, as it would be more costly without advantages. Only deletes all the edges
+    # From vertex
     def remove_vertex (self, index):
-        self.number_vertex -= 1
-        self.adj_matrix.pop(index)
-        for vertex in self.adj_matrix:
-            vertex.pop(index)
+
+        edges = self.adj_matrix[index].copy()
+
+        for i in range(len(self.adj_matrix)):
+            self.adj_matrix[i][index] = 0
+            self.adj_matrix[index][i] = 0
+        
+        return edges
 
     # This function has no use alone but it is a template for other functions using BFS algorithm which generate
     # More relevant results, such as calculating shortest path and the blossom algorithm
@@ -133,77 +141,3 @@ class Graph:
                     if index == v2:
                         return distances[index]
                     
-    def find_augmenting_path (
-        self, vertex: int
-    ):
-        pass
-    
-    def maximum_matching (
-        self
-    ) -> tuple[list[tuple[int,int]], list[int]]:
-    
-        matching = Matching(self.number_vertex)
-
-        while (matching.non_matched):
-
-            for vertex in matching.non_matched:
-
-                path = self.find_augmenting_path(vertex)
-
-                # updating vertexes in path
-                if path:
-                    matching.make_matched(path[0])
-                    matching.make_matched(path[-1])
-                    for v1, v2 in zip(path[::2], path[1::2]):
-                        matching.change_match(v1, v2)
-                    break
-
-            else:
-                print("Tried all free nodes and no path were found")
-                break
-
-        return (matching.get_pairings(), matching.non_matched)
-    
-def find_cycles (ancestors_v1: list[int], ancestors_v2: list[int]) -> list[int]:
-    
-    minimum_lenght = min ([len(ancestors_v1),len(ancestors_v2)])
-
-    for i in range(minimum_lenght):
-        if ancestors_v1[i] == ancestors_v2[i]:
-            aux = i
-            break
-    else:
-        aux = minimum_lenght
-
-    return ancestors_v1[:aux] + ancestors_v2[aux::-1]
-    
-def find_ancestors (parents: dict[int,int], vertex: int) -> list[int]:
-    ancestors = [vertex]
-    current_vertex = vertex
-
-    while (parents[current_vertex]):
-        current_vertex = parents[current_vertex]
-        ancestors.append(current_vertex)
-
-    return ancestors
-
-def binary_search (ordered_list, value, start, end) -> None:
-
-    if start == end:
-        if ordered_list[start][1] > value:
-            return start
-        else:
-            return start+1
-        
-    if start > end:
-        return start
-    
-    mid = (start + end) // 2
-    print(mid)
-    if ordered_list[mid][1] < value:
-        return binary_search(ordered_list, value, mid+1, end)
-
-    elif ordered_list[mid][1] > value:
-        return binary_search(ordered_list, value, start, mid)
-    else:
-        return mid
