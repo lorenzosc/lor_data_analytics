@@ -8,10 +8,12 @@ class blossom(Graph):
     upper_blossoms: list[int] #instead of deleting contracted vertices, 
                               #they'll be referenced by their referred blossom here
     next_blossom: int
+    blossoms_original_edges: list[list[int]]
            
     def __init__(self, number_vertex: int, adj_matrix: list[tuple[int, int, float]] = ...):
         super().__init__(number_vertex, adj_matrix)
         self.blossoms = []
+        self.blossoms_original_edges = []
         self.upper_blossoms = [i for i in range(number_vertex)]
         self.next_blossom = number_vertex
         self.matching = Matching(self.number_vertex)
@@ -74,25 +76,35 @@ class blossom(Graph):
 
                     queue.append(matching.pairings[neighbor])
 
+    # Make each vertex in the cycle map to the blossom in upper blossom and add their edges to the blossom
+    # Only the first time an edge is seen is taken into account to see their real parent.
+    # Then the blossom is added into the graph and their information is stored for later, when lifting
     def contract (
         self, cycle: list[int], cycle_root: int
     ):
         total_size = self.next_blossom+1
         edges = [0 for i in range(total_size)]
+        edge_original = [self.next_blossom for i in range(total_size)]
         for vertex in cycle:
             self.upper_blossoms[vertex] = self.next_blossom
             
             for neighbor in range(total_size-1):
-                if self.adj_matrix[vertex][neighbor]:
+                if self.adj_matrix[vertex][neighbor] and edges[neighbor] == self.next_blossom:
                     edges[neighbor] = self.adj_matrix[vertex][neighbor]
+                    edge_original[neighbor] = vertex
         
         self.blossoms.append(cycle)
+        self.blossoms_original_edges.append(edge_original)
         self.matching.add_vertex(self.next_blossom)
         self.matching.add_match(self.next_blossom, self.matching.pairings[cycle_root])
+
+        # Still need to include edges in the graph (current add vertex method isn't good because changes the number_vertex)
 
         self.next_blossom += 1
         return self.next_blossom - 1
 
+    # makes each vertex in a blossom map to itself in the upper_blossoms array and delete all edges from the blossom
+    # then delete contents of the blossom (although not really necessary, only clears some memory)
     def lift_blossom (
         self, blossom: int
     ):
@@ -102,9 +114,13 @@ class blossom(Graph):
 
         for i in range(self.next_blossom):
             self.adj_matrix[blossom][i] = 0
+            self.adj_matrix[i][blossom] = 0
 
         self.blossoms[blossom].clear()
+        self.blossoms_original_edges[blossom].clear()
 
+    # if a vertex is an original vertex, add it to the path. If it is a blossom, check the entry point, the exit point
+    # decide which direction to go and add vertexes from cycle in order until exit point. Do this for all vertexes
     def construct_path (
         self, path 
     ):
