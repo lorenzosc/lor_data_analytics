@@ -2,13 +2,13 @@ from utils.graph.matching import Matching
 from utils.graph.graph import Graph
 from .. import find_ancestors, find_cycles
 
-class blossom(Graph):
+class Blossom(Graph):
     matching: Matching
     blossoms: list[list[int]] #list of blossoms and their current vertices
     upper_blossoms: list[int] #instead of deleting contracted vertices, 
                               #they'll be referenced by their referred blossom here
     next_blossom: int
-    blossoms_original_edges: list[list[int]]
+    blossoms_original_edges: list[list[int]] # For each blossom, a list mapping the vertex in the graph and their parent in that blossom
            
     def __init__(self, number_vertex: int, adj_matrix: list[tuple[int, int, float]] = ...):
         super().__init__(number_vertex, adj_matrix)
@@ -96,9 +96,15 @@ class blossom(Graph):
         self.blossoms.append(cycle)
         self.blossoms_original_edges.append(edge_original)
         self.matching.add_vertex(self.next_blossom)
-        self.matching.add_match(self.next_blossom, self.matching.pairings[cycle_root])
+        if cycle_root in self.matching.matched:
+            self.matching.add_match(self.next_blossom, self.matching.pairings[cycle_root])
 
         # Still need to include edges in the graph (current add vertex method isn't good because changes the number_vertex)
+        assert self.next_blossom == len(self.adj_matrix)
+        for ind in range(len(self.adj_matrix)):
+            self.adj_matrix[ind].append(edges[ind])
+        self.adj_matrix.append(edges)
+        
 
         self.next_blossom += 1
         return self.next_blossom - 1
@@ -124,7 +130,40 @@ class blossom(Graph):
     def construct_path (
         self, path 
     ):
-        path = []
+        exp_path = []
+        for ind, vertex in enumerate(path):
+
+            # Real vertex should just be appended
+            if vertex < self.number_vertex:
+                exp_path.append(vertex)
+                continue
+            
+            # Finding references (entry and exit) in blossom
+            after_blossom = path[ind+1]
+            bl_number = vertex - self.number_vertex
+            cycle: list = self.blossoms[bl_number]
+            entrance =  cycle.index(self.blossoms_original_edges[bl_number][exp_path[-1]])
+            exit = cycle.index(self.blossoms_original_edges[bl_number][after_blossom])
+
+            # Deciding which way to go in the cycle
+            if (entrance + exit) % 2 == 0 ^ exit == 0:
+                step = 1
+            else:
+                step = len(cycle) - 1
+
+            # Adding vertex from cycle until exit
+            while entrance != exit:
+                exp_path.append(cycle[entrance])
+                entrance += step
+            exp_path.append(cycle[entrance])
+        
+        return exp_path
+            
+    # Overload to inutilize add_vertex once any blossom is created by raising exception
+    def add_vertex(self, weight_list: list[tuple[int, float]]):
+        if self.number_vertex == self.next_blossom:
+            return super().add_vertex(weight_list)
+        raise Exception("Since blossom keeps track of what is a blossom and what is a vertex by their index, new vertexes cannot be added")
 
     def maximum_matching (
         self
