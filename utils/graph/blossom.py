@@ -49,6 +49,12 @@ class Blossom(Graph):
                     self.blossoms[neighbor] != neighbor
                 ):
                     continue
+
+            # It's necessary to adjust point 2 logic. For better performance, it's important to evaluate
+            # Whether recursive calls or to add the blossom in the start of the queue is more important.
+            # It's also important to consider that the list being itearated is also being manipulated,
+            # And that should be avoided, if possible. By making recursive calls and returning the answer,
+            # That would be avoided
                 
             # 2: Now for matched vertex, check if has edge. If not, ignore. Else, check if visited. 
             # If so, find cycle between current_vertex and vertex, and contract if blossom
@@ -82,30 +88,34 @@ class Blossom(Graph):
     def contract (
         self, cycle: list[int], cycle_root: int
     ):
+        # Generating variables from blossom
         total_size = self.next_blossom+1
         edges = [0 for i in range(total_size)]
         edge_original = [self.next_blossom for i in range(total_size)]
+
+        # Contract vertexes in cycle and add their edges to blossom
         for vertex in cycle:
-            self.upper_blossoms[vertex] = self.next_blossom
-            
+            self.upper_blossoms[vertex] = self.next_blossom    
             for neighbor in range(total_size-1):
                 if self.adj_matrix[vertex][neighbor] and edges[neighbor] == self.next_blossom:
                     edges[neighbor] = self.adj_matrix[vertex][neighbor]
                     edge_original[neighbor] = vertex
         
+        # Adding this blossom information to the Blossom graph structure
         self.blossoms.append(cycle)
         self.blossoms_original_edges.append(edge_original)
         self.matching.add_vertex(self.next_blossom)
+
+        # make blossom matched only if root is matched (for when the BFS root is the blossom root)
         if cycle_root in self.matching.matched:
             self.matching.add_match(self.next_blossom, self.matching.pairings[cycle_root])
 
-        # Still need to include edges in the graph (current add vertex method isn't good because changes the number_vertex)
         assert self.next_blossom == len(self.adj_matrix)
+        # Adding edges from blossom into graph
         for ind in range(len(self.adj_matrix)):
             self.adj_matrix[ind].append(edges[ind])
         self.adj_matrix.append(edges)
         
-
         self.next_blossom += 1
         return self.next_blossom - 1
 
@@ -114,14 +124,17 @@ class Blossom(Graph):
     def lift_blossom (
         self, blossom: int
     ):
+        # Make each vertex on the blossom not be ignored in search anymore
         vertexes = self.blossoms[blossom]
         for vertex in vertexes:
             self.upper_blossoms[vertex] = vertex
 
+        # Remove edges from blossom
         for i in range(self.next_blossom):
             self.adj_matrix[blossom][i] = 0
             self.adj_matrix[i][blossom] = 0
 
+        # Free space from blossom information since it's no longer useful
         self.blossoms[blossom].clear()
         self.blossoms_original_edges[blossom].clear()
 
