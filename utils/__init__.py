@@ -2,14 +2,14 @@ def find_cycles (ancestors_v1: list[int], ancestors_v2: list[int]) -> tuple[list
     
     minimum_lenght = min ([len(ancestors_v1),len(ancestors_v2)])
 
-    for i in range(minimum_lenght):
-        if ancestors_v1[i] == ancestors_v2[i]:
-            aux = i
+    for i in range(-1, -minimum_lenght-1, -1):
+        if ancestors_v1[i] != ancestors_v2[i]:
+            aux = i + 1
             break
     else:
-        aux = minimum_lenght
+        aux = i
 
-    return (ancestors_v2[aux::-1] + ancestors_v1[:aux], aux)
+    return (ancestors_v2[aux::-1] + ancestors_v1[:aux], ancestors_v2[aux])
     
 def find_ancestors (parents: dict[int,int], vertex: int) -> list[int]:
     ancestors = [vertex]

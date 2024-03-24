@@ -39,6 +39,8 @@ class Blossom(Graph):
             # obs: no non_matched vertex can be visited, because if they're visited, the function is terminated
             for neighbor in self.matching.non_matched:
                 if self.adj_matrix[current_vertex][neighbor]:
+                    if self.upper_blossoms[neighbor] != neighbor:
+                        continue
                     self.parents[neighbor] = current_vertex
                     return self.trace(neighbor)
 
@@ -47,7 +49,7 @@ class Blossom(Graph):
                 # No edge, the pair or a contracted vertex
                 if (
                     self.adj_matrix[current_vertex][neighbor] == 0 or
-                    self.matching.pairings[current_vertex] == neighbor or
+                    self.matching.pairings.get(current_vertex) == neighbor or
                     self.upper_blossoms[neighbor] != neighbor
                 ):
                     continue
@@ -110,7 +112,9 @@ class Blossom(Graph):
         for vertex in cycle:
             self.upper_blossoms[vertex] = self.next_blossom    
             for neighbor in range(self.next_blossom):
-                if self.adj_matrix[vertex][neighbor] and edges[neighbor] == self.next_blossom:
+                if (self.adj_matrix[vertex][neighbor] 
+                    and edge_original[neighbor] == self.next_blossom
+                ):
                     edges[neighbor] = self.adj_matrix[vertex][neighbor]
                     edge_original[neighbor] = vertex
         
@@ -118,6 +122,7 @@ class Blossom(Graph):
         self.blossoms.append(cycle)
         self.blossoms_original_edges.append(edge_original)
         self.matching.add_vertex(self.next_blossom)
+        self.upper_blossoms.append(self.next_blossom)
 
         # make blossom matched only if root is matched (for when the BFS root is the blossom root)
         if cycle_root in self.matching.matched:
@@ -172,25 +177,26 @@ class Blossom(Graph):
             # Finding references (entry and exit) in blossom
             bl_number = vertex - self.number_vertex
             cycle: list = self.blossoms[bl_number]
-            entrance =  cycle.index(self.blossoms_original_edges[bl_number][exp_path[-1]])
-
-            if vertex in self.matching.matched:
-                exit = cycle.index(self.blossoms_original_edges[bl_number][path[-1]])
+            if not exp_path:
+                entrance = 0
             else:
-                exit = cycle[0]
+                entrance =  cycle.index(self.blossoms_original_edges[bl_number][exp_path[-1]])
+
+
+            exit = cycle.index(self.blossoms_original_edges[bl_number][path[-1]])
 
             # Deciding which way to go in the cycle
-            if (entrance + exit) % 2 == 0 ^ exit == 0:
+            if ((entrance + exit) % 2 == 0) ^ (entrance == 0):
                 step = 1
             else:
                 step = len(cycle) - 1
 
             # Adding vertex from cycle until exit
             while entrance != exit:
-                path.append(cycle[entrance])
-                entrance += step
-                entrance %= len(cycle)
-            path.append(cycle[entrance])
+                path.append(cycle[exit])
+                exit += step
+                exit %= len(cycle)
+            path.append(cycle[exit])
 
             self.lift_blossom(vertex)
         
