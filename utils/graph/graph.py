@@ -5,7 +5,7 @@ class Graph:
     adj_matrix: list[list[int]] = [[]]
     number_vertex: int
 
-    def __init__ (self, number_vertex: int, adj_matrix: list[tuple[int, int, float]] = []):
+    def __init__ (self, number_vertex: int, edge_list: list[tuple[int, int, float]] = list()):
         self.number_vertex = number_vertex
         self.adj_matrix = [
             [
@@ -13,8 +13,9 @@ class Graph:
             ]
             for i in range(number_vertex)
         ]
-        for i, j, weight in adj_matrix:
-            self.update(i, j, weight)
+        if edge_list:
+            for i, j, weight in edge_list:
+                self.update(i, j, weight)
 
     def __getitem__ (self, i, j):
         return self.adj_matrix[i][j]

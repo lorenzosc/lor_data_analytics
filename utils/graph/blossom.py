@@ -1,5 +1,5 @@
-from utils.graph.matching import Matching
-from utils.graph.graph import Graph
+from .matching import Matching
+from .graph import Graph
 from .. import find_cycles
 
 class Blossom(Graph):
@@ -12,8 +12,8 @@ class Blossom(Graph):
     parents: list[int]
     visited: list[bool]
 
-    def __init__(self, number_vertex: int, adj_matrix: list[tuple[int, int, float]] = ...):
-        super().__init__(number_vertex, adj_matrix)
+    def __init__(self, number_vertex: int, edge_list: list[tuple[int, int, float]] = []):
+        super().__init__(number_vertex, edge_list)
         self.blossoms = []
         self.blossoms_original_edges = []
         self.upper_blossoms = [i for i in range(number_vertex)]
@@ -85,7 +85,7 @@ class Blossom(Graph):
         ancestors = []
         current_vertex = vertex
 
-        while (self.parents[current_vertex]):
+        while self.parents[current_vertex] is not None:
             while (self.upper_blossoms[current_vertex] != current_vertex):
                 current_vertex = self.upper_blossoms[current_vertex]
             ancestors.append(current_vertex)

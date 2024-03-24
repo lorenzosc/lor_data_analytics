@@ -28,7 +28,7 @@ class Matching:
 
     def make_matched (self, vertex):
         self.matched.add(vertex)
-        self.non_matched.remove(vertex)
+        self.non_matched.discard(vertex)
 
     # In blossom, once a vertex is matched, it only changes it's opponent, and never goes unmatched again
     # So this method is only for class completude, and probably won't be used
@@ -56,9 +56,10 @@ class Matching:
         #set to not add duplicates
         used = set()
 
-        for v1, v2 in self.pairings:
+        for v1, v2 in self.pairings.items():
             if v2 not in used:
                 used.add(v2)
+                used.add(v1)
                 pairings.append((v1, v2))
 
         return pairings
