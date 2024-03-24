@@ -31,3 +31,11 @@ matching, non_matched = graph.maximum_matching()
 
 print(matching)
 print(non_matched)
+
+vertex = 6
+edges = [(0, 5, 0), (0,4,0), (1,3,0), (2,4,0), (3,4,0), (1, 5, 0), (2, 3, 0), (3, 5, 0), (4, 5, 0)]
+graph = Blossom(vertex, edges)
+matching, non_matched = graph.maximum_matching()
+
+print(matching)
+print(non_matched)

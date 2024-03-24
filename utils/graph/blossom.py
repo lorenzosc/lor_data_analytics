@@ -144,7 +144,8 @@ class Blossom(Graph):
     ):
         if blossom in self.matching.matched:
             self.matching.change_match(self.blossoms[blossom-self.number_vertex][0], self.matching.pairings[blossom-self.number_vertex])
-
+        else:
+            self.matching.make_matched(blossom)
         # Make each vertex on the blossom not be ignored in search anymore
         vertexes = self.blossoms[blossom-self.number_vertex]
         for vertex in vertexes:
@@ -179,6 +180,7 @@ class Blossom(Graph):
             cycle: list = self.blossoms[bl_number]
             if not exp_path:
                 entrance = 0
+
             else:
                 entrance =  cycle.index(self.blossoms_original_edges[bl_number][exp_path[-1]])
 
