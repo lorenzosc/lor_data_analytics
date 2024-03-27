@@ -1,23 +1,23 @@
-from lineup import Lineup
+from utils.lineup import Lineup
 
 class Player():
     
     id: int
-    lineup: Lineup
+    strategy: Lineup
     score: int
     opponent_list: list
     
     def __init__(
-            self, lineup: Lineup, score: int = 0, opponent_list: list = []
+            self, strategy: Lineup, score: int = 0, opponent_list: list = []
             ):
-        self.lineup = lineup
+        self.strategy = strategy
         self.score = score
         self.opponent_list = opponent_list
 
     def decks (
         self
     ):
-        return self.lineup.decks()
+        return self.strategy.decks()
     
     def update_score (
             self, new_score: int
