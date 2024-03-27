@@ -38,7 +38,7 @@ class Blossom(Graph):
             # 1: check for every vertex in non_matched (if any has an edge, it will find an augmenting path)
             # obs: no non_matched vertex can be visited, because if they're visited, the function is terminated
             for neighbor in self.matching.non_matched:
-                if self.adj_matrix[current_vertex][neighbor]:
+                if self.adj_matrix[current_vertex][neighbor] and not self.visited[neighbor]:
                     if self.upper_blossoms[neighbor] != neighbor:
                         continue
                     self.parents[neighbor] = current_vertex
@@ -93,6 +93,8 @@ class Blossom(Graph):
             ancestors.append(current_vertex)
             current_vertex = self.parents[current_vertex]
 
+        while (self.upper_blossoms[current_vertex] != current_vertex):
+            current_vertex = self.upper_blossoms[current_vertex]
         ancestors.append(current_vertex)
 
         return ancestors
@@ -216,6 +218,7 @@ class Blossom(Graph):
         for ind in range(self.number_vertex, self.next_blossom):
             if self.blossoms[ind-self.number_vertex]:
                 self.lift_blossom(ind)
+            
 
     def maximum_matching (
         self
@@ -223,7 +226,9 @@ class Blossom(Graph):
     
         while len(self.matching.non_matched)>1:
 
-            for vertex in self.matching.non_matched:
+            non_matched_vertex = self.matching.non_matched.copy()
+
+            for vertex in non_matched_vertex:
 
                 path = self.find_augmenting_path(vertex)
 
@@ -241,5 +246,6 @@ class Blossom(Graph):
                 print("Tried all free nodes and no path were found")
                 break
 
+        self.lift_all_blossom()
         return (self.matching.get_pairings(), self.matching.non_matched)
     
