@@ -223,6 +223,9 @@ class Blossom(Graph):
     def maximum_matching (
         self
     ) -> tuple[list[tuple[int,int]], list[int]]:
+        
+        if len(self.matching.matched) != 0:
+            raise AttributeError("Cannot call maximum matching twice in a graph")
     
         while len(self.matching.non_matched)>1:
 
@@ -248,4 +251,3 @@ class Blossom(Graph):
 
         self.lift_all_blossom()
         return (self.matching.get_pairings(), self.matching.non_matched)
-    

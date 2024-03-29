@@ -17,8 +17,8 @@ class Graph:
             for i, j, weight in edge_list:
                 self.update(i, j, weight)
 
-    def __getitem__ (self, i, j):
-        return self.adj_matrix[i][j]
+    def __getitem__ (self, i):
+        return self.adj_matrix[i[0]][i[1]]
 
     def update (self, v1: int, v2: int, weight: float):
         if v1 == v2:
