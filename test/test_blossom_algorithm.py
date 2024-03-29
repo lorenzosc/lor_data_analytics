@@ -3,9 +3,9 @@ from utils.graph.blossom import Blossom
 import random
 import sys
 
-@pytest.fixture
-def random_edges_graph():
-    number_vertex = 2000
+@pytest.fixture(params=[100, 500, 1000, 2000])
+def random_edges_graph(request):
+    number_vertex = request.param
     all_edges = [(i, j, 0) for i in range(number_vertex) for j in range(number_vertex) if i != j]
 
     vertexes = [i for i in range(number_vertex)]
