@@ -2,7 +2,7 @@ from utils.graph.blossom import Blossom
 import time
 import random
 
-file_name = "isolated_node_graph_100.txt"
+file_name = "test\\isolated_node_graph_100.txt"
 
 with open(file_name, "r") as file:
     number_vertex = eval(file.readline())

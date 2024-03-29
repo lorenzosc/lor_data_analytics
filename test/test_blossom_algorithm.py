@@ -37,7 +37,7 @@ def random_edges_graph(request):
 @pytest.fixture
 def complete_matching_graph(random_edges_graph):
     number_vertex, all_edges = random_edges_graph
-    with open(f"complete_matching_graph_{number_vertex}.txt", "w+") as file:
+    with open(f"test\\complete_matching_graph_{number_vertex}.txt", "w+") as file:
         file.write(f"{number_vertex}\n")
         file.write(repr(all_edges))
     
@@ -49,7 +49,7 @@ def isolated_node_graph(random_edges_graph):
     number_vertex, all_edges = random_edges_graph
     j = random.randint(0,number_vertex-1)
     all_edges.extend([(i, j, 0) for i in range(number_vertex) if i!=j])
-    with open(f"isolated_node_graph_{number_vertex}.txt", "w+") as file:
+    with open(f"test\\isolated_node_graph_{number_vertex}.txt", "w+") as file:
         file.write(f"{number_vertex}\n")
         file.write(repr(all_edges))
     
