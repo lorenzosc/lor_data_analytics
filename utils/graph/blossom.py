@@ -87,15 +87,13 @@ class Blossom(Graph):
         ancestors = []
         current_vertex = vertex
 
-        while self.parents[current_vertex] is not None:
+        while True:
             while (self.upper_blossoms[current_vertex] != current_vertex):
                 current_vertex = self.upper_blossoms[current_vertex]
             ancestors.append(current_vertex)
+            if self.parents[current_vertex] is None:
+                break
             current_vertex = self.parents[current_vertex]
-
-        while (self.upper_blossoms[current_vertex] != current_vertex):
-            current_vertex = self.upper_blossoms[current_vertex]
-        ancestors.append(current_vertex)
 
         return ancestors
 
@@ -145,7 +143,7 @@ class Blossom(Graph):
         self, blossom: int
     ):
         if blossom in self.matching.matched:
-            self.matching.change_match(self.blossoms[blossom-self.number_vertex][0], self.matching.pairings[blossom-self.number_vertex])
+            self.matching.change_match(self.blossoms[blossom-self.number_vertex][0], self.matching.pairings.pop(blossom))
         else:
             self.matching.make_matched(blossom)
         # Make each vertex on the blossom not be ignored in search anymore
@@ -215,7 +213,7 @@ class Blossom(Graph):
     def lift_all_blossom(
         self
     ):
-        for ind in range(self.number_vertex, self.next_blossom):
+        for ind in range(self.next_blossom-1, self.number_vertex-1, -1):
             if self.blossoms[ind-self.number_vertex]:
                 self.lift_blossom(ind)
             
