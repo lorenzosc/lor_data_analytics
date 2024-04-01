@@ -26,6 +26,11 @@ class Player():
         self
     ) -> int:
         return self.score
+    
+    def get_id (
+        self
+    ) -> int:
+        return self.id
 
     def set_score (
             self, new_score: int
