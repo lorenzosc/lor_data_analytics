@@ -17,7 +17,7 @@ class Player():
         self.strategy = strategy
         self.score = score
     
-    def change_score (
+    def update_score (
         self, score_change: int
     ) -> None:
         self.score += score_change
