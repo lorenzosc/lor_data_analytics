@@ -2,6 +2,7 @@ from utils.player import Player
 from utils.dummy_player import DummyPlayer
 import math
 from utils.graph.blossom import Blossom
+from utils.match import Match
 
 class SwissTournament():
 
@@ -33,12 +34,22 @@ class SwissTournament():
         self.add_player(dummy)
 
         self.current_round = current_round
+        self.rounds = []
 
+    # assynchronous code is necessary here
+    def run_round (
+        self
+    ) -> None:
+        
+        for match in self.rounds[-1]:
+            new_match = Match(match[0], match[1])
+            new_match.resolve()
+    
     def make_round (
         self
     ) -> None:
         
-        rounds = []
+        matches = []
         players_separed_by_points = [standing.copy() for standing in self.standings if standing].reverse()
         for ind, points in enumerate(players_separed_by_points[:-1]):
             if points % 2 == 1:
@@ -66,9 +77,9 @@ class SwissTournament():
             for face_off in matching:
                 p1 = face_off[0]
                 p2 = face_off[1]
-                rounds.append((node_to_player[p1], node_to_player[p2]))
+                matches.append((node_to_player[p1], node_to_player[p2]))
 
-
+        self.rounds.append(matches)
 
     def find_lower_standing_neighbors (
         self, standing: int, player_separated_by_points: list
@@ -127,8 +138,21 @@ class SwissTournament():
 
     def view_standings (
         self
-    ):
-        pass
+    ) -> list[tuple[int]]:
+        highest_to_lowest = []
+
+        for player_id, player in self.players.items():
+            opp_points = 0
+
+            for opp in self.player_adversaries[player_id]:
+                opp_points += self.players[opp].get_score()
+            
+            player_info = (player_id, player.get_score(), opp_points)
+            highest_to_lowest.append(player_info)
+
+        highest_to_lowest = sorted(highest_to_lowest, key= lambda x: (x[1], x[2]), reverse=True)
+
+        return highest_to_lowest
 
     def run (
         self
@@ -141,9 +165,9 @@ class SwissTournament():
             resolve each match
             get result from all matches
             update player scores v
-            update player adversaries
+            update player adversaries v
             drop players v
-            show new standings
+            show new standings v
             while not in last round: proceed to next round
             '''
 
