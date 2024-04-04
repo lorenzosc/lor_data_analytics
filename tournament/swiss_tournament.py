@@ -35,15 +35,6 @@ class SwissTournament():
 
         self.current_round = current_round
         self.rounds = []
-
-    # assynchronous code is necessary here
-    def run_round (
-        self
-    ) -> None:
-        
-        for match in self.rounds[-1]:
-            new_match = Match(match[0], match[1])
-            new_match.resolve()
     
     def make_round (
         self
@@ -185,24 +176,24 @@ class SwissTournament():
 
             self.update_adversaries(p1.get_id(), p2.get_id())
         
-        standings = self.view_standings()
-
     def run (
         self
     ) -> None:
-        '''
-        initialize tournament
-        start round 
-            drop players v
-            add players v
-            make all matches v
-            resolve each match
-            get result from all matches
-            update player scores v
-            update player adversaries v
-            show new standings v
-            while not in last round: proceed to next round
-            '''
+        
+        while (self.number_of_rounds > self.current_round):
+            self.current_round += 1
+
+            new_players = []
+            for player in new_players:
+                self.add_player(player)
+
+            dropping_players = []
+            for player in dropping_players:
+                self.drop_player(player)
+            
+            self.execute_round()
+
+            print(self.view_standings())
 
     def add_player (
         self, player: Player
