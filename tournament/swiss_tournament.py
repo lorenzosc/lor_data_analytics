@@ -127,7 +127,7 @@ class SwissTournament():
         self, player_id: int, new_score: int
     ) -> None:
         self.standings[self.players[player_id].get_score()].remove(player_id)
-        self.players[player_id].set_Score(new_score)
+        self.players[player_id].set_score(new_score)
         self.standings[self.players[player_id].get_score()].append(player_id)
 
     def update_adversaries (
@@ -154,19 +154,52 @@ class SwissTournament():
 
         return highest_to_lowest
 
+    def execute_round (
+        self
+    ) -> None:
+        
+        players = self.number_players + self.dropped_players[self.bye.get_id()] - sum(self.dropped_players.values())
+
+        if players % 2 == 0 and not self.dropped_players[self.bye.get_id()]:
+            self.drop_player(self.bye.get_id())
+        if players % 2 == 1 and self.dropped_players[self.bye.get_id()]:
+            self.undrop_player()    
+        
+        self.make_round()
+
+        matches = [Match(self.players[match[0]], self.players[match[1]]) for match in self.rounds[-1]]
+
+        for new_match in matches:
+            p1 = new_match.player1
+            p2 = new_match.player2
+            new_match.resolve()
+            result = new_match.get_result()
+
+            if result == 0:
+                self.update_player_score(p1.get_id(), 2)
+            elif result == 1:
+                self.update_player_score(p2.get_id(), 2)
+            elif result == 2:
+                self.update_player_score(p1.get_id(), 1)
+                self.update_player_score(p2.get_id(), 1)
+
+            self.update_adversaries(p1.get_id(), p2.get_id())
+        
+        standings = self.view_standings()
+
     def run (
         self
     ) -> None:
         '''
         initialize tournament
         start round 
+            drop players v
             add players v
             make all matches v
             resolve each match
             get result from all matches
             update player scores v
             update player adversaries v
-            drop players v
             show new standings v
             while not in last round: proceed to next round
             '''
