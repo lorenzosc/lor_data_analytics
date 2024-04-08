@@ -1,4 +1,5 @@
 from .player import Player
+from .dummy_player import DummyPlayer
 import random
 
 class Match:
@@ -30,4 +31,9 @@ class Match:
     def resolve (
         self
     ) -> None:
-        self.result = random.randint(0, 2)
+        if isinstance(self.player1, DummyPlayer):
+            self.result = 1
+        elif isinstance(self.player2, DummyPlayer):
+            self.result = 0
+        else:
+            self.result = random.randint(0, 2)
