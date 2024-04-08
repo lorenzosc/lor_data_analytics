@@ -2,7 +2,6 @@ from utils.player import Player
 from utils.dummy_player import DummyPlayer
 import math
 from utils.graph.blossom import Blossom
-from utils.match import Match
 
 class SwissTournament():
 
@@ -41,9 +40,13 @@ class SwissTournament():
     ) -> None:
         
         matches = []
-        players_separed_by_points = [standing.copy() for standing in self.standings if standing].reverse()
-        for ind, points in enumerate(players_separed_by_points[:-1]):
-            if points % 2 == 1:
+        players_separed_by_points = [standing.copy() for standing in self.standings if standing]
+        players_separed_by_points.reverse()
+        for ind, points in enumerate(players_separed_by_points):
+            if len(points) % 2 == 1 and ind == len(players_separed_by_points)-1:
+                raise ValueError("Too many points")
+
+            if len(points) % 2 == 1:
                 matched_below_player = self.find_lower_standing_neighbors(ind, players_separed_by_points)
                 points.remove(matched_below_player)
                 players_separed_by_points[ind+1].append(matched_below_player)
@@ -93,14 +96,12 @@ class SwissTournament():
     def drop_player (
         self, player_id: int
     ) -> None:
-        
         self.dropped_players[player_id] = True
         self.standings[self.players[player_id].get_score()].remove(player_id)
 
     def undrop_player (
         self, player_id: int = None
     ) -> None:
-        
         if player_id == None:
             player_id = self.bye.get_id()
         
@@ -148,52 +149,12 @@ class SwissTournament():
     def execute_round (
         self
     ) -> None:
-        
-        players = self.number_players + self.dropped_players[self.bye.get_id()] - sum(self.dropped_players.values())
-
-        if players % 2 == 0 and not self.dropped_players[self.bye.get_id()]:
-            self.drop_player(self.bye.get_id())
-        if players % 2 == 1 and self.dropped_players[self.bye.get_id()]:
-            self.undrop_player()    
-        
-        self.make_round()
-
-        matches = [Match(self.players[match[0]], self.players[match[1]]) for match in self.rounds[-1]]
-
-        for new_match in matches:
-            p1 = new_match.player1
-            p2 = new_match.player2
-            new_match.resolve()
-            result = new_match.get_result()
-
-            if result == 0:
-                self.update_player_score(p1.get_id(), 2)
-            elif result == 1:
-                self.update_player_score(p2.get_id(), 2)
-            elif result == 2:
-                self.update_player_score(p1.get_id(), 1)
-                self.update_player_score(p2.get_id(), 1)
-
-            self.update_adversaries(p1.get_id(), p2.get_id())
+        pass
         
     def run (
         self
     ) -> None:
-        
-        while (self.number_of_rounds > self.current_round):
-            self.current_round += 1
-
-            new_players = []
-            for player in new_players:
-                self.add_player(player)
-
-            dropping_players = []
-            for player in dropping_players:
-                self.drop_player(player)
-            
-            self.execute_round()
-
-            print(self.view_standings())
+        pass
 
     def add_player (
         self, player: Player
@@ -203,7 +164,7 @@ class SwissTournament():
             raise AttributeError("Player score can't be negative or higher than limit")
         
         self.players[player.get_id()] = player
-        self.standings[player.get_score()].append(player)
+        self.standings[player.get_score()].append(player.get_id())
         self.player_adversaries[player.get_id()] = []
         self.dropped_players[player.get_id()] = False
         self.number_players += 1
