@@ -3,7 +3,7 @@ from tournament.swiss_tournament_simulator import SwissTournamentSimulator
 from utils.player import Player
 
 players = []
-for i in range(8):
+for i in range(11):
     players.append(
         Player(
             name=f"Player{i}",

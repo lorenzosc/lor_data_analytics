@@ -44,7 +44,7 @@ class SwissTournament():
         players_separed_by_points.reverse()
         for ind, points in enumerate(players_separed_by_points):
             if len(points) % 2 == 1 and ind == len(players_separed_by_points)-1:
-                raise ValueError("Too many points")
+                raise ValueError("Somehow there's an odd number of players")
 
             if len(points) % 2 == 1:
                 matched_below_player = self.find_lower_standing_neighbors(ind, players_separed_by_points)
@@ -65,8 +65,8 @@ class SwissTournament():
             matching, non_matched = graph.maximum_matching()
 
             for player in non_matched:
-                points.remove(player)
-                players_separed_by_points[ind+1].append(player)
+                points.remove(node_to_player[player])
+                players_separed_by_points[ind+1].append(node_to_player[player])
 
             for face_off in matching:
                 p1 = face_off[0]
