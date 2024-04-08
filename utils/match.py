@@ -1,4 +1,4 @@
-from player import Player
+from .player import Player
 import random
 
 class Match:
@@ -30,4 +30,4 @@ class Match:
     def resolve (
         self
     ) -> None:
-        return random.randint(0, 2)
+        self.result = random.randint(0, 2)
