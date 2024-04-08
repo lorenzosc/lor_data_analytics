@@ -1,11 +1,12 @@
 from player import Player
+import random
 
 class Match:
 
     player1: Player
     player2: Player
     status: str
-    result: tuple[int,int]
+    result: int
 
     def __init__ (
         self, player1: Player, player2: Player
@@ -17,7 +18,7 @@ class Match:
 
     def get_result (
         self
-    ) -> tuple[int,int]:
+    ) -> int:
         return self.result
     
     def get_status (
@@ -25,7 +26,8 @@ class Match:
     ) -> str:
         return self.status
     
+    # Virtual method
     def resolve (
         self
     ) -> None:
-        pass
+        return random.randint(0, 2)
