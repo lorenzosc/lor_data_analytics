@@ -36,4 +36,4 @@ class Match:
         elif isinstance(self.player2, DummyPlayer):
             self.result = 0
         else:
-            self.result = random.randint(0, 2)
+            self.result = random.randint(0, 1)
