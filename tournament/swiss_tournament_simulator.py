@@ -67,4 +67,4 @@ class SwissTournamentSimulator(SwissTournament):
             
             self.execute_round()
 
-            print(self.view_standings())
+        print(self.view_standings())
